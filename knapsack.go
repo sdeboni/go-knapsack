@@ -1,3 +1,4 @@
+// iteration 3 is a refinement of iteration 2 inspired by nmortier12's solution which is a further optimization possible by observing that only the maximum value is returned, and knowing which items were included in the total is not required.
 package knapsack
 
 type Item struct {
@@ -11,10 +12,7 @@ func Knapsack(maximumWeight int, items []Item) int {
 
   //dynamic programming solution
   //source: https://en.wikipedia.org/wiki/Knapsack_problem
-  var m = make([][]int, len(items)+1)
-  for i := 0; i < len(m); i++ {
-    m[i] = make([]int, maximumWeight+1)
-  } 
+  val := make([]int, maximumWeight+1)
 
   var max = func(a, b int) int {
     if a >= b {
@@ -23,15 +21,11 @@ func Knapsack(maximumWeight int, items []Item) int {
     return b
   }
 
-  for i := 1; i < len(m); i++ {
-    for j := 1; j <= maximumWeight; j++ {
-      if items[i-1].Weight > j {
-        m[i][j] = m[i-1][j]
-      } else {
-        m[i][j] = max(m[i-1][j], m[i-1][j-items[i-1].Weight]+ items[i-1].Value)
-      }
-    }
+  for _, item := range items {
+    for w := maximumWeight; w >= item.Weight; w-- {
+      val[w] = max(val[w], val[w-item.Weight] + item.Value)
+    } 
   }
 
-  return m[len(items)][maximumWeight]
+  return val[maximumWeight]
 }
